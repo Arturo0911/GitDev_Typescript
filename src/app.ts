@@ -8,24 +8,37 @@ import multer from 'multer';
 import {connect_database} from './connection';
 import favicon from 'serve-favicon';
 import passport from 'passport';
-//import {PassportUser} from './routes/autentication'; 
+import flash from 'connect-flash';
+import session from 'express-session' ;
 import * as Passportconfig from './routes/autentication';
+import MySQLStore from  'express-mysql-session' ;
+import {Sequelize} from 'sequelize';
+import {IUser,connect,database} from './controllers/interface';
+//const session_stor = MySQLStore(session);
+
+
 export class App {
 
     private app: Application;
 
     constructor (private port?: number| string){ 
         //Passportconfig;
-        Passportconfig;
+        
         this.app = express();
         this.port_settings();
         this.middlewares();
         this.Connecion_verify ();
+        this.routers();
         //this.Global_variables();
 
     }
 
     port_settings(){
+        this.app.use(session({
+            secret: 'Arturon',
+            resave:false,
+            saveUninitialized: false
+        }));
         this.app.set('port', this.port || process.env.PORT || 3000);
         this.app.set('views',path.join(__dirname, 'views'));
         this.app.engine('.hbs',handlebars({
@@ -36,18 +49,17 @@ export class App {
 
         }));
         this.app.set('view engine', '.hbs');
+        this.app.use('/public',express.static(path.join(__dirname, 'public'))); // espcificamos las carpetas publicas
     }
 
     middlewares(){
         
-        //const serialPassporrt = new PassportUser();
-        this.app.use((req:Request, res:Response, next:NextFunction)=>{
-            this.app.locals.user =  req.user;
-            console.log('esta funcionando las variables globales');
-            
-            next();
-        });
+        
+        this.app.use(flash());
+        
         //serialPassporrt.save_newUser();
+        //this.app.use();
+        //Passportconfig;
         this.app.use(morgan('dev'));
         this.app.use(express.urlencoded({extended:false}));
         this.app.use(favicon(__dirname+ '/public/img/interface.png'));
@@ -57,12 +69,34 @@ export class App {
         this.app.use(express.json());
         this.app.use(passport.initialize()); // here initialize passport
         this.app.use(passport.session());
+        this.app.use((req, res, next)=>{
+            this.app.locals.user =  req.user;
+            //console.log("req.user ",req.user);
+            this.app.locals.success =  req.flash('success');
+            this.app.locals.messagge =  req.flash('messagge');
+            next();
+        });
+        
+        
+        //Passportconfig;
+        
+        
+    }
+    routers(){
         this.app.use('/main',router);
         this.app.use('/aut',routerSignup);
-        this.app.use('/public',express.static(path.join(__dirname, 'public'))); // espcificamos las carpetas publicas
+        
     }
-    
-    
+    /*Global_variables(){
+        this.app.use((req, res, next)=>{
+            this.app.locals.user =  req.user;
+            console.log("req.user ",req.user);
+            
+            this.app.locals.success =  req.flash('success');
+            this.app.locals.messagge =  req.flash('messagge');
+            next();
+        });
+    }*/
     async Connecion_verify (){
         const connect =  await connect_database();
         return connect;

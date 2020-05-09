@@ -11,6 +11,10 @@ router.get('/', (req, res) => {
     res.send('my aplicaction is woriking :v');
     console.log('ESTA FUNCIONANDO');
 });
+router.get('/code_zone', (req, res) => {
+    res.render('routes/code_zone');
+    console.log('usuario', req.user);
+});
 /*router.get('/index', (req:Request,res:Response)=>{
     res.render('routes/index');
 });*/

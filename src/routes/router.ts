@@ -10,6 +10,11 @@ import {index_page} from '../controllers/controller';
 router.get('/', (req:Request,res:Response)=>{
     res.send('my aplicaction is woriking :v');
     console.log('ESTA FUNCIONANDO');
+});
+
+router.get('/code_zone', (req: Request, res:Response)=>{
+    res.render('routes/code_zone');
+    console.log('usuario', req.user);
     
 });
 

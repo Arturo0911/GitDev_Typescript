@@ -21,3 +21,7 @@ export async function connect_database() {
     //connect.query =  promisify(connect.query);
     return connect;
 }
+
+export interface database_credencials {
+    
+}

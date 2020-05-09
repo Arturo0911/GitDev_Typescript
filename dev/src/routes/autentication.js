@@ -83,6 +83,7 @@ passport_1.default.use('signup_local', new localStrategy({
         password: generate
     };
     console.log('objeto que se va a insertar', new_user);
+    //console.log();
     /**
      * ESPECIFY WHAT IS THE NEW PLACE TO SAVE WE IMAGES, INCLUDING OLD PATH DESTINY AND THE NEW DESTINY
     */
@@ -90,7 +91,11 @@ passport_1.default.use('signup_local', new localStrategy({
         extension === '.jpeg' || extension === '.gif') {
         fs_extra_1.default.rename(path_original, new_destiny);
     }
-    yield connect.query('INSERT INTO users SET ?', [new_user]);
+    const resultado = yield connect.query('INSERT INTO users SET ?', [new_user]);
+    //console.log('resultado: ',resultado);
+    const constante = resultado[0];
+    new_user.id = constante.insertId;
+    console.log('new_user.id ', new_user.id);
     return done(null, new_user);
 })));
 routerSignup.post('/signup', passport_1.default.authenticate('signup_local', {
@@ -98,21 +103,13 @@ routerSignup.post('/signup', passport_1.default.authenticate('signup_local', {
     failureRedirect: '/aut/signup',
     failureFlash: true
 }));
-passport_1.default.serializeUser((user, done) => {
-    done(null, user.user);
-});
-passport_1.default.deserializeUser((user, done) => __awaiter(void 0, void 0, void 0, function* () {
-    const connect = yield connection_1.connect_database();
-    const rows = yield connect.query('SELECT * FROM users WHERE user=?', [user]);
-    done(undefined, rows[0]);
-}));
 /**
  * after signup process will be redirect to signin
  * now we have serializaded username and password
  */
 routerSignup.post('/login', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     passport_1.default.authenticate('local_signin', {
-        successRedirect: '/main/index',
+        successRedirect: '/main/code_zone',
         failureRedirect: '/aut/login',
         failureFlash: true
     })(req, res, next);
@@ -126,26 +123,28 @@ passport_1.default.use('local_signin', new localStrategy({
     const conecction = yield sequelize.query(`SELECT * FROM users WHERE user = '${user}'`, { type: sequelize_1.QueryTypes.SELECT });
     console.log('conecction', conecction);
     if (conecction.length > 0) {
-        const rows = conecction[0];
-        /* const new_rows = JSON.stringify(rows,null)
-        console.log('new_rows',new_rows); */
-        console.log('rows =', rows);
-        const Confirm_password = yield passwords_1.MatchPass(password, rows.password);
-        console.log('rows: ', rows.password);
+        const user = conecction[0];
+        const Confirm_password = yield passwords_1.MatchPass(password, user.password);
         if (Confirm_password) {
-            console.log('usuario existe');
-            done(null, rows);
+            done(null, user, req.flash('success', 'bienvenido Sr.' + user.user));
         }
         else {
-            console.log('contraseña incorrecta');
-            done(null, false);
+            done(null, false, req.flash('messagge', 'contraseña incorrecta'));
         }
     }
     else {
-        console.log('usuario incorrecto...');
-        done(null, false);
+        return done(null, false, req.flash('messagge', 'contraseña incorrecta'));
     }
-    //console.log('rows2: ', JSON.stringify(rows,null, 3)[2]);
-    //console.log('rows: ',rows);
 })));
+passport_1.default.serializeUser((user, done) => {
+    done(null, user.id);
+});
+passport_1.default.deserializeUser((id, done) => __awaiter(void 0, void 0, void 0, function* () {
+    const sequelize = new sequelize_1.Sequelize('mysql://root:@localhost:3306/GitDev2');
+    const rows2 = yield sequelize.query(`SELECT * FROM users WHERE id=${id}`, { type: sequelize_1.QueryTypes.SELECT });
+    //console.log('rows', rows);
+    //console.log('rows2', rows2);
+    //console.log('rows2[0]', rows2[0]); 
+    done(null, rows2[0]);
+}));
 exports.default = routerSignup;

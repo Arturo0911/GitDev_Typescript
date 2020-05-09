@@ -1,3 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-datos: { }
+exports.database = {
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'GitDev2'
+};
