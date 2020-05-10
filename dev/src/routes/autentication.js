@@ -19,6 +19,7 @@ const passport_local_1 = __importDefault(require("passport-local"));
 const passwords_1 = require("../lib/passwords");
 const fs_extra_1 = __importDefault(require("fs-extra"));
 const path_1 = __importDefault(require("path"));
+const controller_1 = require("../controllers/controller");
 const sequelize_1 = require("sequelize");
 /**
  * call method database
@@ -34,10 +35,10 @@ const localStrategy = passport_local_1.default.Strategy;
 /**
  * ROUTES TO GET FORM TO SINGUP AND SIGNIN
  */
-routerSignup.get('/signup', (req, res) => {
+routerSignup.get('/signup', controller_1.ItsNotLogged, (req, res) => {
     res.render('template/signup');
 });
-routerSignup.get('/login', (req, res) => {
+routerSignup.get('/login', controller_1.ItsNotLogged, (req, res) => {
     res.render('template/signin');
 });
 /***
@@ -82,7 +83,6 @@ passport_1.default.use('signup_local', new localStrategy({
         user: req.body.user,
         password: generate
     };
-    console.log('objeto que se va a insertar', new_user);
     //console.log();
     /**
      * ESPECIFY WHAT IS THE NEW PLACE TO SAVE WE IMAGES, INCLUDING OLD PATH DESTINY AND THE NEW DESTINY
@@ -92,13 +92,11 @@ passport_1.default.use('signup_local', new localStrategy({
         fs_extra_1.default.rename(path_original, new_destiny);
     }
     const resultado = yield connect.query('INSERT INTO users SET ?', [new_user]);
-    //console.log('resultado: ',resultado);
     const constante = resultado[0];
     new_user.id = constante.insertId;
-    console.log('new_user.id ', new_user.id);
     return done(null, new_user);
 })));
-routerSignup.post('/signup', passport_1.default.authenticate('signup_local', {
+routerSignup.post('/signup', controller_1.ItsNotLogged, passport_1.default.authenticate('signup_local', {
     successRedirect: '/aut/login',
     failureRedirect: '/aut/signup',
     failureFlash: true
@@ -107,7 +105,7 @@ routerSignup.post('/signup', passport_1.default.authenticate('signup_local', {
  * after signup process will be redirect to signin
  * now we have serializaded username and password
  */
-routerSignup.post('/login', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+routerSignup.post('/login', controller_1.ItsNotLogged, (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     passport_1.default.authenticate('local_signin', {
         successRedirect: '/main/code_zone',
         failureRedirect: '/aut/login',
@@ -121,7 +119,6 @@ passport_1.default.use('local_signin', new localStrategy({
 }, (req, user, password, done) => __awaiter(void 0, void 0, void 0, function* () {
     const sequelize = new sequelize_1.Sequelize('mysql://root:@localhost:3306/GitDev2');
     const conecction = yield sequelize.query(`SELECT * FROM users WHERE user = '${user}'`, { type: sequelize_1.QueryTypes.SELECT });
-    console.log('conecction', conecction);
     if (conecction.length > 0) {
         const user = conecction[0];
         const Confirm_password = yield passwords_1.MatchPass(password, user.password);
@@ -142,9 +139,10 @@ passport_1.default.serializeUser((user, done) => {
 passport_1.default.deserializeUser((id, done) => __awaiter(void 0, void 0, void 0, function* () {
     const sequelize = new sequelize_1.Sequelize('mysql://root:@localhost:3306/GitDev2');
     const rows2 = yield sequelize.query(`SELECT * FROM users WHERE id=${id}`, { type: sequelize_1.QueryTypes.SELECT });
-    //console.log('rows', rows);
-    //console.log('rows2', rows2);
-    //console.log('rows2[0]', rows2[0]); 
     done(null, rows2[0]);
 }));
+routerSignup.get('/logout', (req, res) => {
+    req.logOut();
+    res.redirect('/aut/login');
+});
 exports.default = routerSignup;

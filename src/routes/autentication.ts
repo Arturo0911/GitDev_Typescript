@@ -7,6 +7,7 @@ import { encrypt, MatchPass, Gen_Random } from '../lib/passwords';
 import fs from 'fs-extra';
 import path from 'path';
 import { IUser,ResultSetheader_data } from '../controllers/interface';
+import {ItsLogged,ItsNotLogged} from  '../controllers/controller';
 import { Sequelize, QueryTypes, DATEONLY } from 'sequelize';
 
 
@@ -34,10 +35,10 @@ const localStrategy = PassportLocal.Strategy;
  * ROUTES TO GET FORM TO SINGUP AND SIGNIN
  */
 
-routerSignup.get('/signup', (req: Request, res: Response) => {
+routerSignup.get('/signup',ItsNotLogged, (req: Request, res: Response) => {
     res.render('template/signup');
 });
-routerSignup.get('/login', (req: Request, res: Response) => {
+routerSignup.get('/login', ItsNotLogged,(req: Request, res: Response) => {
     res.render('template/signin');
 });
 
@@ -90,7 +91,6 @@ passport.use('signup_local', new localStrategy({
         user: req.body.user,
         password: generate
     };
-    console.log('objeto que se va a insertar', new_user);
     //console.log();
     
     /**
@@ -103,14 +103,12 @@ passport.use('signup_local', new localStrategy({
     }
 
     const resultado = await connect.query('INSERT INTO users SET ?', [new_user]);
-    //console.log('resultado: ',resultado);
     const constante = <ResultSetheader_data> resultado[0];
     new_user.id = constante.insertId;
-    console.log('new_user.id ',new_user.id);
     return done(null, new_user);
 
 }));
-routerSignup.post('/signup', passport.authenticate('signup_local', {
+routerSignup.post('/signup',ItsNotLogged, passport.authenticate('signup_local', {
     successRedirect: '/aut/login',
     failureRedirect: '/aut/signup',
     failureFlash: true
@@ -123,7 +121,7 @@ routerSignup.post('/signup', passport.authenticate('signup_local', {
  * now we have serializaded username and password
  */
 
-routerSignup.post('/login', async (req: Request, res: Response, next: NextFunction) => {
+routerSignup.post('/login',ItsNotLogged, async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('local_signin', {
         successRedirect: '/main/code_zone',
         failureRedirect: '/aut/login',
@@ -138,7 +136,6 @@ passport.use('local_signin', new localStrategy({
     const sequelize = new Sequelize('mysql://root:@localhost:3306/GitDev2');
     const conecction = await sequelize.query(`SELECT * FROM users WHERE user = '${user}'`, { type: QueryTypes.SELECT });
 
-    console.log('conecction', conecction);
     if (conecction.length > 0) {
         const user = <IUser>conecction[0];  
         const Confirm_password = await MatchPass(password, user.password);
@@ -165,12 +162,14 @@ passport.serializeUser<any, any>((user, done) => {
 passport.deserializeUser<any,any>(async (id, done) => {
     const sequelize = new Sequelize('mysql://root:@localhost:3306/GitDev2');
     const rows2 = await sequelize.query(`SELECT * FROM users WHERE id=${id}`,{ type: QueryTypes.SELECT });
-    //console.log('rows', rows);
-    //console.log('rows2', rows2);
-    //console.log('rows2[0]', rows2[0]); 
     done(null, rows2[0]);
 });
 
+
+routerSignup.get('/logout', (req:Request,res:Response)=>{
+    req.logOut();
+    res.redirect('/aut/login');
+});
 
 
 export default routerSignup;
