@@ -1,24 +1,29 @@
 <div class="containter p-4 ">
     <div class="row">
-        <div class="col-md-3">
-             <div class="card">
-                <div class="card-header">
+        {{#each verify}}
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-header">
 
-                </div>
-                <div class="card-body">
-                    
-                </div>
-            </div>
-        </div>
-        <div class="col-md-8">
-            <div class="card mx-auto">
-                <div class="card-header">
-                    <h5 class="card-title">Questions</h5>
-                </div>
-                <div class="card-body">
-                    <button class="btn btn-success" >Ver</button>
+                    </div>
+                    <div class="card-body">
+
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <div class="col-md-8">
+                <div class="card mx-auto">
+                    <div class="card-header">
+                        <h5 class="card-title">{{titulos}}</h5>
+                        <a ></a>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{texto}}</p>
+                        <a href="/main/verify_post/{{id}}" class="btn btn-success">Entrar</a>
+                    </div>
+                </div>
+            </div>
+        {{/each}}
     </div>
 </div>

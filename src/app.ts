@@ -14,7 +14,6 @@ import * as Passportconfig from './routes/autentication';
 import MySQLStore from  'express-mysql-session' ;
 import {Sequelize} from 'sequelize';
 import {IUser,connect,database} from './controllers/interface';
-//const session_stor = MySQLStore(session);
 
 
 export class App {
@@ -22,15 +21,12 @@ export class App {
     private app: Application;
 
     constructor (private port?: number| string){ 
-        //Passportconfig;
         
         this.app = express();
         this.port_settings();
         this.middlewares();
         this.Connecion_verify ();
         this.routers();
-        //this.Global_variables();
-
     }
 
     port_settings(){
@@ -39,7 +35,7 @@ export class App {
             resave:false,
             saveUninitialized: false
         }));
-        this.app.set('port', this.port || process.env.PORT || 3000);
+        this.app.set('port', this.port || process.env.PORT || 4000);
         this.app.set('views',path.join(__dirname, 'views'));
         this.app.engine('.hbs',handlebars({
             defaultLayout: 'main',
@@ -49,17 +45,11 @@ export class App {
 
         }));
         this.app.set('view engine', '.hbs');
-        this.app.use('/public',express.static(path.join(__dirname, 'public'))); // espcificamos las carpetas publicas
+        this.app.use('/public',express.static(path.join(__dirname, 'public')));
     }
 
     middlewares(){
-        
-        
         this.app.use(flash());
-        
-        //serialPassporrt.save_newUser();
-        //this.app.use();
-        //Passportconfig;
         this.app.use(morgan('dev'));
         this.app.use(express.urlencoded({extended:false}));
         this.app.use(favicon(__dirname+ '/public/img/interface.png'));
@@ -77,31 +67,17 @@ export class App {
             next();
         });
         
-        
-        //Passportconfig;
-        
-        
     }
     routers(){
         this.app.use('/main',router);
         this.app.use('/aut',routerSignup);
         
     }
-    /*Global_variables(){
-        this.app.use((req, res, next)=>{
-            this.app.locals.user =  req.user;
-            console.log("req.user ",req.user);
-            
-            this.app.locals.success =  req.flash('success');
-            this.app.locals.messagge =  req.flash('messagge');
-            next();
-        });
-    }*/
     async Connecion_verify (){
         const connect =  await connect_database();
         return connect;
     }
-    // aqui definiremos el proceso asincrono de estcuchar el puerto.
+    
     async listening (){
         await this.app.listen(this.app.get('port'));
         console.log('the app is on localhost listening on port: ', this.app.get('port'));

@@ -6,14 +6,22 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        
         <ul class="navbar-nav mr-auto">
             {{#if user}}
                 <li class="nav-item active">
                     <a class="nav-link" href="#">{{user.name}} <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Enlaces</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        Procesos
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/main/posted">Postear</a>
+                        <a class="dropdown-item" href="/main/navigation">Revisar publicaciones</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Salir</a>
+                    </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"

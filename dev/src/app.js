@@ -24,17 +24,14 @@ const serve_favicon_1 = __importDefault(require("serve-favicon"));
 const passport_1 = __importDefault(require("passport"));
 const connect_flash_1 = __importDefault(require("connect-flash"));
 const express_session_1 = __importDefault(require("express-session"));
-//const session_stor = MySQLStore(session);
 class App {
     constructor(port) {
-        //Passportconfig;
         this.port = port;
         this.app = express_1.default();
         this.port_settings();
         this.middlewares();
         this.Connecion_verify();
         this.routers();
-        //this.Global_variables();
     }
     port_settings() {
         this.app.use(express_session_1.default({
@@ -51,13 +48,10 @@ class App {
             extname: '.hbs'
         }));
         this.app.set('view engine', '.hbs');
-        this.app.use('/public', express_1.default.static(path_1.default.join(__dirname, 'public'))); // espcificamos las carpetas publicas
+        this.app.use('/public', express_1.default.static(path_1.default.join(__dirname, 'public')));
     }
     middlewares() {
         this.app.use(connect_flash_1.default());
-        //serialPassporrt.save_newUser();
-        //this.app.use();
-        //Passportconfig;
         this.app.use(morgan_1.default('dev'));
         this.app.use(express_1.default.urlencoded({ extended: false }));
         this.app.use(serve_favicon_1.default(__dirname + '/public/img/interface.png'));
@@ -74,29 +68,17 @@ class App {
             this.app.locals.messagge = req.flash('messagge');
             next();
         });
-        //Passportconfig;
     }
     routers() {
         this.app.use('/main', router_1.default);
         this.app.use('/aut', autentication_1.default);
     }
-    /*Global_variables(){
-        this.app.use((req, res, next)=>{
-            this.app.locals.user =  req.user;
-            console.log("req.user ",req.user);
-            
-            this.app.locals.success =  req.flash('success');
-            this.app.locals.messagge =  req.flash('messagge');
-            next();
-        });
-    }*/
     Connecion_verify() {
         return __awaiter(this, void 0, void 0, function* () {
             const connect = yield connection_1.connect_database();
             return connect;
         });
     }
-    // aqui definiremos el proceso asincrono de estcuchar el puerto.
     listening() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.app.listen(this.app.get('port'));

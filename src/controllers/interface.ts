@@ -1,6 +1,16 @@
 import { RowDataPacket } from 'mysql2/promise';
 import { DatabaseError } from 'sequelize/types';
 
+export interface insertPost {
+    id?: number,
+    fullname ?:string | any,
+    titulos?:string,
+    etiqueta?:string,
+    texto?:string,
+    estado?:string
+}
+
+
 export interface IUser {
     id?: number,
     credencials: string,
@@ -36,4 +46,11 @@ export const database = {
     user: 'root',
     password: '',
     database: 'GitDev2'
+}
+
+export interface revision_post {
+    id ?: number,
+    watch_user ?:string | any,
+    vistas ?:number,
+    id_post_posted ?:number,
 }
