@@ -35,7 +35,7 @@
         "@types/serve-favicon": "^2.5.0",
         "bcryptjs": "^2.4.3",
         "connect-flash": "^0.1.1",
-        "express": "^4.17.1",
+        "express": "^4.17.3",
         "express-handlebars": "^4.0.4",
         "express-mysql": "0.0.1",
         "express-mysql-session": "^2.1.4",
